@@ -32,15 +32,22 @@ export const HeroJar = ({
             strokeWidth="20"
           />
 
-          {/* Jar Rim */}
+          {/* Jar Lid & Slot */}
           <path
-            d="M85 20 C 85 11.7157, 91.7157 5, 100 5 C 108.284 5, 115 11.7157, 115 20"
+            d="M80 20 H 120"
             stroke="hsl(var(--stroke))"
-            strokeWidth="3"
-            fill="hsl(var(--card))"
+            strokeWidth="5"
+            strokeLinecap="round"
           />
           <path
-            d="M80 35 H 120"
+            d="M95 18 C 95 10, 105 10, 105 18"
+            stroke="hsl(var(--stroke))"
+            strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <path
+            d="M90 30 H 110"
             stroke="hsl(var(--stroke))"
             strokeWidth="3"
             strokeLinecap="round"
