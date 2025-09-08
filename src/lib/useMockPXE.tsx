@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 
 export type PxeStatus =
   | "connected"
@@ -54,7 +54,7 @@ export function useMockPXE() {
   }, [notes, getPrivateTotal]);
 
   const tip = useCallback(() => {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       const steps: PxeStatus[] = ["encrypting", "proving", "submitting"];
       let currentStep = 0;
 
