@@ -4,7 +4,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { TopBar } from "@/components/TopBar";
 import { Tabs } from "@/components/Tabs";
 import { FooterStatus } from "@/components/FooterStatus";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { inter, jetbrains_mono, poppins } from "./fonts";
 import { cn } from "@/lib/utils";
 
@@ -37,9 +36,6 @@ export default function RootLayout({
             </div>
           </main>
           <FooterStatus />
-          <div className="absolute bottom-4 right-4">
-            <MadeWithDyad />
-          </div>
         </div>
         <Toaster
           position="top-right"
