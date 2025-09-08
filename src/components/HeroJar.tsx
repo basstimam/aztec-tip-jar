@@ -17,32 +17,42 @@ export const HeroJar = ({
         xmlns="http://www.w3.org/2000/svg"
       >
         <g transform="translate(10, 10)">
+          {/* Jar Outline */}
           <path
-            d="M40 40H140"
-            stroke="#171717"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M130 40C130 21.2222 116.569 6 100 6H80C63.4315 6 50 21.2222 50 40V55H130V40Z"
+            d="M 70 40 C 70 28.95 78.95 20 90 20 H 110 C 121.05 20 130 28.95 130 40 V 60 H 140 V 70 H 130 V 160 C 130 171.05 121.05 180 110 180 H 90 C 78.95 180 70 171.05 70 160 V 70 H 60 V 60 H 70 V 40 Z"
             fill="#fff"
             stroke="#171717"
             strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
+          {/* Separator Line */}
           <path
-            d="M50 55V155C50 166.046 58.9543 175 70 175H110C121.046 175 130 166.046 130 155V55"
-            fill="#fff"
+            d="M70 70 H 130"
             stroke="#171717"
             strokeWidth="3"
             strokeLinecap="round"
-            strokeLinejoin="round"
           />
           {/* Coin */}
-          <circle cx="90" cy="100" r="15" fill="#F7B500" stroke="#171717" strokeWidth="3" />
-          <text x="90" y="105" fontFamily="JetBrains Mono" fontSize="14" fill="#171717" textAnchor="middle" fontWeight="bold">$</text>
+          <circle
+            cx="100"
+            cy="120"
+            r="15"
+            fill="#F7B500"
+            stroke="#171717"
+            strokeWidth="3"
+          />
+          <text
+            x="100"
+            y="125"
+            fontFamily="JetBrains Mono"
+            fontSize="14"
+            fill="#171717"
+            textAnchor="middle"
+            fontWeight="bold"
+          >
+            $
+          </text>
         </g>
       </svg>
       {label && (
