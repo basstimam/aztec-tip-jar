@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMockPXE } from "@/lib/useMockPXE";
+import { usePXE } from "../context/PXEContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ProgressSteps } from "@/components/ProgressSteps";
@@ -10,12 +10,16 @@ import { cn } from "@/lib/utils";
 
 export const TipForm = () => {
   const [token, setToken] = useState("ETH");
-  const { status, tip } = useMockPXE();
-  const isProcessing = status !== "connected" && status !== "confirmed" && status !== "error";
+  const { status, tip, isConnected } = usePXE();
+  const isProcessing =
+    status !== "connected" &&
+    status !== "confirmed" &&
+    status !== "error" &&
+    status !== "disconnected";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isProcessing) return;
+    if (isProcessing || !isConnected) return;
     tip();
   };
 
@@ -88,9 +92,10 @@ export const TipForm = () => {
               >
                 <Button
                   type="submit"
-                  className="w-full rounded-md border-[3px] border-stroke bg-primary py-6 text-lg font-bold text-primary-ink shadow-[0_5px_0_0_hsl(var(--stroke))] transition-transform active:translate-y-1 active:shadow-none"
+                  disabled={!isConnected}
+                  className="w-full rounded-md border-[3px] border-stroke bg-primary py-6 text-lg font-bold text-primary-ink shadow-[0_5px_0_0_hsl(var(--stroke))] transition-transform active:translate-y-1 active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
                 >
-                  Tip Privately
+                  {isConnected ? "Tip Privately" : "Connect Wallet to Tip"}
                 </Button>
               </motion.div>
             )}

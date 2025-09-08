@@ -1,17 +1,17 @@
 "use client";
 
-import { useMockPXE } from "@/lib/useMockPXE";
+import { usePXE } from "../context/PXEContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const WithdrawPublicCard = () => {
-  const { withdrawPublic, status } = useMockPXE();
+  const { withdrawPublic, status, isConnected } = usePXE();
   const isLoading = status === "submitting";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLoading) return;
+    if (isLoading || !isConnected) return;
     withdrawPublic();
   };
 
@@ -47,8 +47,8 @@ export const WithdrawPublicCard = () => {
         </div>
         <Button
           type="submit"
-          disabled={isLoading}
-          className="w-full rounded-md border-[3px] border-stroke bg-primary py-3 text-base font-bold text-primary-ink shadow-[0_4px_0_0_hsl(var(--stroke))] transition-transform active:translate-y-1 active:shadow-none"
+          disabled={isLoading || !isConnected}
+          className="w-full rounded-md border-[3px] border-stroke bg-primary py-3 text-base font-bold text-primary-ink shadow-[0_4px_0_0_hsl(var(--stroke))] transition-transform active:translate-y-1 active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
         >
           {isLoading ? "Withdrawing..." : "Withdraw"}
         </Button>

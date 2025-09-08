@@ -1,12 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { useMockPXE } from "@/lib/useMockPXE";
+import { usePXE, MockNote } from "../context/PXEContext";
 import { Button } from "./ui/button";
 
 export const NotesList = () => {
-  const { notes } = useMockPXE();
+  const { notes, isConnected } = usePXE();
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+
+  if (!isConnected) {
+    return (
+      <div className="rounded-lg border-[3px] border-stroke bg-card p-6 text-center shadow">
+        <p className="font-bold">Connect your wallet</p>
+        <p className="text-sm text-ink/70">
+          Connect your wallet to view your private notes.
+        </p>
+      </div>
+    );
+  }
 
   if (notes.length === 0) {
     return (
@@ -23,7 +34,7 @@ export const NotesList = () => {
     <div className="rounded-lg border-[3px] border-stroke bg-card p-6 shadow">
       <h3 className="mb-4 text-xl font-bold">Private Notes</h3>
       <div className="space-y-2">
-        {notes.map((note) => (
+        {notes.map((note: MockNote) => (
           <div
             key={note.id}
             className="flex items-center justify-between rounded-md border-[2.5px] border-stroke bg-card p-3"

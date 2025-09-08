@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { PxeStatus } from "@/lib/useMockPXE";
+import { PxeStatus } from "../context/PXEContext";
 
 const steps = ["encrypting", "proving", "submitting", "confirmed"];
 const stepLabels = ["Encrypting", "Proving", "Submitting", "Confirmed"];

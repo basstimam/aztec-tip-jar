@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  createContext,
+  useContext,
+  ReactNode,
+} from "react";
 import { toast } from "sonner";
 import { CheckCircle } from "lucide-react";
 
@@ -10,7 +17,8 @@ export type PxeStatus =
   | "proving"
   | "submitting"
   | "confirmed"
-  | "error";
+  | "error"
+  | "disconnected";
 
 export type MockNote = {
   id: string;
@@ -24,10 +32,46 @@ const MOCK_NOTES: MockNote[] = [
   { id: "note_3", amount: 0.25, timestamp: "3 hours ago" },
 ];
 
-export function useMockPXE() {
-  const [status, setStatus] = useState<PxeStatus>("connected");
+interface PXEContextType {
+  status: PxeStatus;
+  notes: MockNote[];
+  privateTotal: number;
+  isConnected: boolean;
+  mockAddress: string | null;
+  scanNotes: () => Promise<MockNote[]>;
+  getPrivateTotal: () => number;
+  tip: () => Promise<void>;
+  withdrawPublic: () => Promise<void>;
+  withdrawPrivate: () => Promise<void>;
+  connect: () => void;
+  disconnect: () => void;
+}
+
+const PXEContext = createContext<PXEContextType | undefined>(undefined);
+
+export const PXEProvider = ({ children }: { children: ReactNode }) => {
+  const [status, setStatus] = useState<PxeStatus>("disconnected");
   const [notes, setNotes] = useState<MockNote[]>([]);
   const [privateTotal, setPrivateTotal] = useState(0);
+  const [isConnected, setIsConnected] = useState(false);
+  const [mockAddress, setMockAddress] = useState<string | null>(null);
+
+  const connect = () => {
+    setIsConnected(true);
+    setMockAddress("0x1234...abcd");
+    setStatus("connected");
+    toast("Wallet Connected", {
+      icon: <CheckCircle className="text-success" />,
+    });
+  };
+
+  const disconnect = () => {
+    setIsConnected(false);
+    setMockAddress(null);
+    setStatus("disconnected");
+    setNotes([]);
+    toast("Wallet Disconnected");
+  };
 
   const scanNotes = useCallback(() => {
     setStatus("submitting");
@@ -101,14 +145,28 @@ export function useMockPXE() {
     });
   }, []);
 
-  return {
+  const value = {
     status,
     notes,
     privateTotal,
+    isConnected,
+    mockAddress,
     scanNotes,
     getPrivateTotal,
     tip,
     withdrawPublic,
     withdrawPrivate,
+    connect,
+    disconnect,
   };
-}
+
+  return <PXEContext.Provider value={value}>{children}</PXEContext.Provider>;
+};
+
+export const usePXE = () => {
+  const context = useContext(PXEContext);
+  if (context === undefined) {
+    throw new Error("usePXE must be used within a PXEProvider");
+  }
+  return context;
+};

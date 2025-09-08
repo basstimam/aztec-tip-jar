@@ -1,9 +1,10 @@
 "use client";
 
-import { useMockPXE } from "@/lib/useMockPXE";
+import { usePXE } from "../context/PXEContext";
 import { AnimatePresence, motion } from "framer-motion";
 
 const statusText: { [key: string]: string } = {
+  disconnected: "Disconnected",
   connected: "Connected",
   encrypting: "Encrypting...",
   proving: "Proving...",
@@ -13,7 +14,7 @@ const statusText: { [key: string]: string } = {
 };
 
 export const FooterStatus = () => {
-  const { status } = useMockPXE();
+  const { status } = usePXE();
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 flex justify-center p-4">

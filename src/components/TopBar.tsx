@@ -1,6 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { usePXE } from "../context/PXEContext";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User } from "lucide-react";
 
 const JarIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -36,6 +45,8 @@ const JarIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export const TopBar = () => {
+  const { isConnected, mockAddress, connect, disconnect } = usePXE();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b-[3px] border-stroke bg-bg/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
@@ -46,12 +57,42 @@ export const TopBar = () => {
           </span>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <Button
-            variant="outline"
-            className="rounded-full border-[2.5px] bg-card px-4 py-2 text-sm font-bold shadow-none"
-          >
-            Connect
-          </Button>
+          {isConnected ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 rounded-full border-[2.5px] bg-card px-3 py-2 text-sm font-bold shadow-none"
+                >
+                  <Avatar className="h-6 w-6 border-2 border-stroke">
+                    <AvatarFallback className="bg-accent text-white">
+                      <User size={14} />
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="font-mono">{mockAddress}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="border-[2.5px] border-stroke bg-card"
+              >
+                <DropdownMenuItem
+                  onClick={disconnect}
+                  className="cursor-pointer font-bold"
+                >
+                  Disconnect
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              onClick={connect}
+              variant="outline"
+              className="rounded-full border-[2.5px] bg-card px-4 py-2 text-sm font-bold shadow-none"
+            >
+              Connect
+            </Button>
+          )}
         </div>
       </div>
     </header>
