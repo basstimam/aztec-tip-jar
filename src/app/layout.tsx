@@ -5,6 +5,8 @@ import { TopBar } from "@/components/TopBar";
 import { Tabs } from "@/components/Tabs";
 import { FooterStatus } from "@/components/FooterStatus";
 import { MadeWithDyad } from "@/components/made-with-dyad";
+import { inter, jetbrains_mono, poppins } from "./fonts";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Aztec Private Tip Jar",
@@ -18,19 +20,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Poppins:wght@600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="antialiased">
+      <body
+        className={cn(
+          "antialiased",
+          inter.variable,
+          jetbrains_mono.variable,
+          poppins.variable
+        )}
+      >
         <div className="relative flex min-h-screen flex-col pb-20">
           <TopBar />
           <main className="flex-1">

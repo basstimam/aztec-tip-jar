@@ -18,9 +18,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ["Poppins", "sans-serif"],
-        body: ["Inter", "sans-serif"],
-        mono: ["'JetBrains Mono'", "monospace"],
+        heading: ["var(--font-poppins)", "sans-serif"],
+        body: ["var(--font-inter)", "sans-serif"],
+        mono: ["var(--font-jetbrains-mono)", "monospace"],
       },
       colors: {
         bg: "hsl(var(--bg))",
