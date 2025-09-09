@@ -3,26 +3,28 @@
 // - withdraw_public(amount, to): owner tarik dana ke saldo publik (amount terlihat)
 // - withdraw_private(amount, to_private): owner tarik dana tetap privat (buat note baru)
 
-mod interfaces;
+use dep::aztec::{
+    macros::aztec,
+    prelude::{AztecAddress, PublicMutable}
+};
+use dep::token::Token;
 
-use dep::aztec::prelude::{AztecAddress, PublicMutable};
-pub use interfaces::token::Token;
-
+#[aztec]
 contract TipJar {
-    #[aztec(storage)]
-    struct Storage {
-        owner: PublicMutable<AztecAddress, 1>,
-        accepted_token: PublicMutable<AztecAddress, 1>,
+    #[storage]
+    struct Storage<Context> {
+        owner: PublicMutable<AztecAddress, Context>,
+        accepted_token: PublicMutable<AztecAddress, Context>,
     }
     
-    #[aztec(public)]
-    #[aztec(initializer)]
+    #[public]
+    #[initializer]
     fn init(owner: AztecAddress, accepted_token: AztecAddress) {
         storage.owner.write(owner);
         storage.accepted_token.write(accepted_token);
     }
 
-    #[aztec(public)]
+    #[public]
     fn withdraw_public(to: AztecAddress, amount: Field) {
         let owner = storage.owner.read();
         assert(context.msg_sender() == owner, "Unauthorized");
@@ -31,16 +33,16 @@ contract TipJar {
         Token::at(token_address).transfer_public(context.this_address(), to, amount).call(&mut context);
     }
 
-    #[aztec(private)]
+    #[private]
     fn tip_private(amount: Field) {
         let token_address = storage.accepted_token.read();
         
         // Transfer private: dari pengirim ke alamat kontrak
         // Sesuai guide: transfer_in_private dari sender ke contract
-        Token::at(token_address).transfer_in_private(context.msg_sender(), context.this_address(), amount).call(&mut context);
+        Token::at(token_address).transfer_in_private(context.msg_sender(), context.this_address(), amount, 0).call(&mut context);
     }
 
-    #[aztec(private)]
+    #[private]
     fn withdraw_private(to_private: AztecAddress, amount: Field) {
         let owner = storage.owner.read();
         assert(context.msg_sender() == owner, "Unauthorized");
@@ -49,6 +51,6 @@ contract TipJar {
         
         // Transfer private: dari contract ke owner (tetap privat)
         // Sesuai guide: notes ownership transfer
-        Token::at(token_address).transfer_in_private(context.this_address(), to_private, amount).call(&mut context);
+        Token::at(token_address).transfer_in_private(context.this_address(), to_private, amount, 0).call(&mut context);
     }
 }
