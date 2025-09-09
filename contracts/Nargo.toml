@@ -6,6 +6,4 @@ version = "0.1.0"
 
 [dependencies]
 aztec = { git = "https://github.com/AztecProtocol/aztec-packages/", tag = "aztec-packages-v1.2.0", directory = "noir-projects/aztec-nr/aztec" }
-authwit = { git = "https://github.com/AztecProtocol/aztec-packages/", tag = "aztec-packages-v1.2.0", directory = "noir-projects/aztec-nr/authwit" }
 compressed_string = { git = "https://github.com/AztecProtocol/aztec-packages/", tag = "aztec-packages-v1.2.0", directory = "noir-projects/aztec-nr/compressed-string" }
-
