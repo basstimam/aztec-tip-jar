@@ -6,8 +6,8 @@ class MockAccountManager {
     private address: AztecAddress;
 
     constructor() {
-        // Generate a mock Aztec address for development
-        this.address = AztecAddress.fromString("0x1234567890123456789012345678901234567890");
+        // Generate a mock Aztec address for development (32-byte format)
+        this.address = AztecAddress.fromString("0x1234567890123456789012345678901234567890123456789012345678901234");
     }
 
     async getWallet() {
