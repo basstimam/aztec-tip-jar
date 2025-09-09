@@ -58,4 +58,3 @@ impl TipJar {
         token.transfer_in_private(context.this_address(), to_private, amount);
     }
 }
-

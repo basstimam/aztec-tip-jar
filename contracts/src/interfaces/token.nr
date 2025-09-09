@@ -9,4 +9,3 @@ trait Token {
     // Transfer publik: gerakkan saldo publik dari kontrak ke penerima
     fn transfer_public(from: AztecAddress, to: AztecAddress, amount: Field) -> ();
 }
-
