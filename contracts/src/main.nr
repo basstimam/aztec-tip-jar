@@ -4,8 +4,11 @@
 // - withdraw_private(amount, to_private): owner tarik dana tetap privat (buat note baru)
 
 use dep::aztec::{
-    macros::aztec,
-    prelude::{AztecAddress, PublicMutable}
+    macros::{
+        functions::{private, public, initializer},
+        storage::storage,
+    },
+    prelude::{AztecAddress, PublicMutable},
 };
 use dep::token::Token;
 
@@ -16,7 +19,7 @@ contract TipJar {
         owner: PublicMutable<AztecAddress, Context>,
         accepted_token: PublicMutable<AztecAddress, Context>,
     }
-    
+
     #[public]
     #[initializer]
     fn init(owner: AztecAddress, accepted_token: AztecAddress) {
@@ -28,7 +31,7 @@ contract TipJar {
     fn withdraw_public(to: AztecAddress, amount: Field) {
         let owner = storage.owner.read();
         assert(context.msg_sender() == owner, "Unauthorized");
-        
+
         let token_address = storage.accepted_token.read();
         Token::at(token_address).transfer_public(context.this_address(), to, amount).call(&mut context);
     }
@@ -36,7 +39,7 @@ contract TipJar {
     #[private]
     fn tip_private(amount: Field) {
         let token_address = storage.accepted_token.read();
-        
+
         // Transfer private: dari pengirim ke alamat kontrak
         // Sesuai guide: transfer_in_private dari sender ke contract
         Token::at(token_address).transfer_in_private(context.msg_sender(), context.this_address(), amount, 0).call(&mut context);
@@ -46,9 +49,9 @@ contract TipJar {
     fn withdraw_private(to_private: AztecAddress, amount: Field) {
         let owner = storage.owner.read();
         assert(context.msg_sender() == owner, "Unauthorized");
-        
+
         let token_address = storage.accepted_token.read();
-        
+
         // Transfer private: dari contract ke owner (tetap privat)
         // Sesuai guide: notes ownership transfer
         Token::at(token_address).transfer_in_private(context.this_address(), to_private, amount, 0).call(&mut context);
