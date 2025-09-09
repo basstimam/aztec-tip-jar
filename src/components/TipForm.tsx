@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 export const TipForm = () => {
   const [token, setToken] = useState("ETH");
+  const [amount, setAmount] = useState("");
   const { status, tip, isConnected } = usePXE();
   const isProcessing =
     status !== "connected" &&
@@ -19,8 +20,14 @@ export const TipForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isProcessing || !isConnected) return;
-    tip();
+    if (isProcessing || !isConnected || !amount) return;
+    
+    const tipAmount = parseFloat(amount);
+    if (isNaN(tipAmount) || tipAmount <= 0) {
+      return;
+    }
+    
+    tip(tipAmount);
   };
 
   return (
@@ -54,14 +61,19 @@ export const TipForm = () => {
             type="number"
             placeholder="0.0"
             step="0.01"
+            min="0"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
             className="h-20 border-[3px] bg-card pl-6 pr-20 text-4xl font-mono focus-visible:ring-offset-0"
+            required
           />
           <Button
             type="button"
             variant="ghost"
+            onClick={() => setAmount("1.0")} // Set example amount
             className="absolute right-4 top-1/2 -translate-y-1/2 rounded-md border-[2.5px] border-stroke bg-card px-3 py-1 text-xs font-bold hover:bg-primary/10"
           >
-            MAX
+            1.0
           </Button>
         </div>
 
@@ -92,10 +104,15 @@ export const TipForm = () => {
               >
                 <Button
                   type="submit"
-                  disabled={!isConnected}
+                  disabled={!isConnected || !amount || parseFloat(amount) <= 0}
                   className="w-full rounded-md border-[3px] border-stroke bg-primary py-6 text-lg font-bold text-primary-ink shadow-[0_5px_0_0_hsl(var(--stroke))] transition-transform active:translate-y-1 active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
                 >
-                  {isConnected ? "Tip Privately" : "Connect Wallet to Tip"}
+                  {!isConnected 
+                    ? "Connect Wallet to Tip" 
+                    : !amount || parseFloat(amount) <= 0
+                    ? "Enter Amount"
+                    : `Tip ${amount} ${token} Privately`
+                  }
                 </Button>
               </motion.div>
             )}

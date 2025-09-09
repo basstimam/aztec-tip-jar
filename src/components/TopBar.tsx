@@ -45,7 +45,7 @@ const JarIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export const TopBar = () => {
-  const { isConnected, mockAddress, connect, disconnect } = usePXE();
+  const { isConnected, address, connect, disconnect } = usePXE();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b-[3px] border-stroke bg-bg/80 backdrop-blur-sm">
@@ -69,7 +69,7 @@ export const TopBar = () => {
                       <User size={14} />
                     </AvatarFallback>
                   </Avatar>
-                  <span className="font-mono">{mockAddress}</span>
+                  <span className="font-mono">{address}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
