@@ -31,21 +31,34 @@ pub contract TipJar {
     }
 
     #[public]
-    fn record_tip_public(amount: Field) {
+    fn record_tip_public(_amount: Field) {
         // Record the tip amount - this is a placeholder
         // In real implementation, this would update balances
     }
 
     #[public]
-    fn withdraw_public(to: AztecAddress, amount: Field) {
-        assert(storage.owner.read().eq(context.msg_sender()), "Unauthorized");
+    fn withdraw_public(_to: AztecAddress, _amount: Field) {
+        // In public functions, we can read storage
+        let owner = storage.owner.read();
+        assert(owner.eq(context.msg_sender()), "Unauthorized");
         // Placeholder for token transfer logic
         // Would call token contract's transfer_public function
     }
 
     #[private]
     fn withdraw_private(to_private: AztecAddress, amount: Field) {
-        assert(storage.owner.read().eq(context.msg_sender()), "Unauthorized");
+        // For private functions, we need to use public function for authorization
+        // and pass the required data
+        TipJar::at(context.this_address())
+            .withdraw_private_public(to_private, amount)
+            .enqueue(&mut context);
+    }
+
+    #[public]
+    fn withdraw_private_public(_to_private: AztecAddress, _amount: Field) {
+        // This public function handles the authorization check
+        let owner = storage.owner.read();
+        assert(owner.eq(context.msg_sender()), "Unauthorized");
         // Placeholder for private withdrawal logic
         // Would call token contract's transfer_in_private function
     }
