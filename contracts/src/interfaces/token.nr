@@ -2,10 +2,10 @@
 use dep::aztec::prelude::AztecAddress;
 
 #[aztec(interface)]
-trait Token {
+pub trait Token {
     // Transfer privat: konsumsi notes dari `from`, buat notes untuk `to`
-    fn transfer_in_private(from: AztecAddress, to: AztecAddress, amount: Field) -> ();
+    fn transfer_in_private(from: AztecAddress, to: AztecAddress, amount: Field);
     
     // Transfer publik: gerakkan saldo publik dari kontrak ke penerima
-    fn transfer_public(from: AztecAddress, to: AztecAddress, amount: Field) -> ();
+    fn transfer_public(from: AztecAddress, to: AztecAddress, amount: Field);
 }

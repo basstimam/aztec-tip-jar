@@ -6,18 +6,17 @@
 mod interfaces;
 
 use dep::aztec::prelude::{AztecAddress, PublicMutable};
-use interfaces::token::Token;
+pub use interfaces::token::Token;
 
-#[aztec(storage)]
-struct Storage {
-    owner: PublicMutable<AztecAddress>,
-    accepted_token: PublicMutable<AztecAddress>,
-}
-
-#[aztec(contract)]
-impl TipJar {
+contract TipJar {
+    #[aztec(storage)]
+    struct Storage {
+        owner: PublicMutable<AztecAddress, 1>,
+        accepted_token: PublicMutable<AztecAddress, 1>,
+    }
     
     #[aztec(public)]
+    #[aztec(initializer)]
     fn init(owner: AztecAddress, accepted_token: AztecAddress) {
         storage.owner.write(owner);
         storage.accepted_token.write(accepted_token);
@@ -29,20 +28,16 @@ impl TipJar {
         assert(context.msg_sender() == owner, "Unauthorized");
         
         let token_address = storage.accepted_token.read();
-        let token = Token::at(token_address);
-        
-        // Call token's public transfer function
-        token.transfer_public(context.this_address(), to, amount);
+        Token::at(token_address).transfer_public(context.this_address(), to, amount).call(&mut context);
     }
 
     #[aztec(private)]
     fn tip_private(amount: Field) {
         let token_address = storage.accepted_token.read();
-        let token = Token::at(token_address);
         
         // Transfer private: dari pengirim ke alamat kontrak
         // Sesuai guide: transfer_in_private dari sender ke contract
-        token.transfer_in_private(context.msg_sender(), context.this_address(), amount);
+        Token::at(token_address).transfer_in_private(context.msg_sender(), context.this_address(), amount).call(&mut context);
     }
 
     #[aztec(private)]
@@ -51,10 +46,9 @@ impl TipJar {
         assert(context.msg_sender() == owner, "Unauthorized");
         
         let token_address = storage.accepted_token.read();
-        let token = Token::at(token_address);
         
         // Transfer private: dari contract ke owner (tetap privat)
         // Sesuai guide: notes ownership transfer
-        token.transfer_in_private(context.this_address(), to_private, amount);
+        Token::at(token_address).transfer_in_private(context.this_address(), to_private, amount).call(&mut context);
     }
 }
