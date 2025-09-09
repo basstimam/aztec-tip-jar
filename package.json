@@ -7,12 +7,20 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "build:contracts": "echo \"Add your Aztec contract build command here\"",
-    "deploy:contract": "tsx scripts/deploy.ts",
-    "tip:test": "tsx scripts/tip.ts"
+    "build:contracts": "aztec-nargo compile",
+    "codegen": "aztec codegen target --outdir src/artifacts",
+    "deploy:contract": "tsx scripts/deploy_contract.ts",
+    "tip:test": "tsx scripts/tip.ts",
+    "compile": "aztec-nargo compile",
+    "clean": "rm -rf ./src/artifacts ./target"
   },
   "dependencies": {
+    "@aztec/accounts": "1.2.0",
     "@aztec/aztec.js": "1.2.0",
+    "@aztec/noir-contracts.js": "1.2.0",
+    "@aztec/protocol-contracts": "1.2.0",
+    "@aztec/pxe": "1.2.0",
+    "@aztec/stdlib": "1.2.0",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
