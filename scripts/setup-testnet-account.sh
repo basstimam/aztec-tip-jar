@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Aztec Testnet Account Setup Script
+# Aztec Testnet Account Setup Script with Extended Timeout
 # This script sets up an account for deployment to Aztec testnet
 
 set -e
@@ -19,23 +19,39 @@ echo "👛 Wallet alias: $WALLET_ALIAS"
 echo "💰 Sponsored FPC: $SPONSORED_FPC_ADDRESS"
 echo ""
 
-# Step 1: Create account
-echo "1️⃣ Creating account..."
-aztec-wallet create-account \
-    --register-only \
-    --node-url $NODE_URL \
-    --alias $WALLET_ALIAS
+# Function to check if account exists
+check_account_exists() {
+    echo "🔍 Checking if account already exists..."
+    if aztec-wallet accounts list --node-url $NODE_URL | grep -q $WALLET_ALIAS; then
+        echo "✅ Account $WALLET_ALIAS already exists!"
+        return 0
+    else
+        echo "ℹ️ Account $WALLET_ALIAS not found, will create new one"
+        return 1
+    fi
+}
 
-if [ $? -eq 0 ]; then
-    echo "✅ Account created successfully!"
+# Step 1: Create account (skip if exists)
+if ! check_account_exists; then
+    echo "1️⃣ Creating account..."
+    aztec-wallet create-account \
+        --register-only \
+        --node-url $NODE_URL \
+        --alias $WALLET_ALIAS
+
+    if [ $? -eq 0 ]; then
+        echo "✅ Account created successfully!"
+    else
+        echo "❌ Failed to create account"
+        exit 1
+    fi
 else
-    echo "❌ Failed to create account"
-    exit 1
+    echo "⏭️ Skipping account creation (already exists)"
 fi
 
 echo ""
 
-# Step 2: Register with sponsored FPC
+# Step 2: Register with sponsored FPC (allow failure and continue)
 echo "2️⃣ Registering with sponsored FPC..."
 aztec-wallet register-contract \
     --node-url $NODE_URL \
@@ -47,35 +63,54 @@ aztec-wallet register-contract \
 if [ $? -eq 0 ]; then
     echo "✅ Successfully registered with sponsored FPC!"
 else
-    echo "❌ Failed to register with sponsored FPC"
-    exit 1
+    echo "⚠️ FPC registration might have failed, but continuing..."
+    echo "📝 This might be because it's already registered"
 fi
 
 echo ""
 
-# Step 3: Deploy account
+# Step 3: Deploy account with extended timeout (10 minutes = 600 seconds)
 echo "3️⃣ Deploying account to testnet..."
+echo "⏰ Using extended timeout: 10 minutes (600 seconds)"
+echo "📝 Note: This process involves client-side proof generation which can take time"
+echo "🔄 Please wait, even if it seems stuck..."
+echo ""
+
+# Set timeout to 10 minutes (600000 milliseconds)
 aztec-wallet deploy-account \
     --node-url $NODE_URL \
     --from $WALLET_ALIAS \
     --payment method=fpc-sponsored,fpc=contracts:sponsoredfpc \
-    --register-class
+    --register-class \
+    --timeout 600000
 
-if [ $? -eq 0 ]; then
+DEPLOY_RESULT=$?
+
+if [ $DEPLOY_RESULT -eq 0 ]; then
     echo "✅ Account deployed successfully!"
 else
-    echo "❌ Failed to deploy account"
-    exit 1
+    echo "⚠️ Deploy command timed out or failed"
+    echo "📋 This doesn't necessarily mean deployment failed!"
+    echo "🔍 Please check transaction status manually:"
+    echo "   - aztecscan.io"
+    echo "   - aztecexplorer.xyz"
+    echo ""
+    echo "🧪 Test if account is working:"
+    echo "   aztec-wallet accounts list --node-url $NODE_URL"
+    echo ""
+    echo "📝 If account is listed and shows as deployed, you can proceed with contract deployment"
 fi
 
 echo ""
-echo "🎉 Account setup completed!"
+echo "🎉 Account setup process completed!"
 echo ""
 echo "📋 Next steps:"
-echo "1. Compile your contracts: pnpm compile"
-echo "2. Deploy token contract: pnpm deploy:token"
-echo "3. Update .env with token address"
-echo "4. Deploy TipJar contract: pnpm deploy:contract"
+echo "1. Verify account status: aztec-wallet accounts list --node-url $NODE_URL"
+echo "2. Compile contracts: pnpm compile"
+echo "3. Deploy token contract: pnpm deploy:token"
+echo "4. Update .env with token address"
+echo "5. Deploy TipJar contract: pnpm deploy:contract"
 echo ""
-echo "📖 Check your account info:"
-echo "aztec-wallet accounts list --node-url $NODE_URL"
+echo "🔗 Useful commands:"
+echo "Check account info: aztec-wallet account info $WALLET_ALIAS --node-url $NODE_URL"
+echo "List contracts: aztec-wallet contracts list --node-url $NODE_URL"

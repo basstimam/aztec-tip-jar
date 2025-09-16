@@ -11,6 +11,7 @@
     "codegen": "aztec codegen contracts/target --outdir src/artifacts",
     "build:contracts": "pnpm compile && pnpm codegen",
     "setup:testnet": "bash scripts/setup-testnet-account.sh",
+    "setup:hybrid": "bash scripts/setup-hybrid-pxe.sh",
     "deploy:token": "tsx scripts/deploy_token.ts",
     "deploy:contract": "tsx scripts/deploy_contract.ts",
     "deploy:testnet": "echo 'Run: pnpm setup:testnet first, then pnpm deploy:token, then pnpm deploy:contract'",
