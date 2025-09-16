@@ -10,11 +10,11 @@
     "compile": "cd contracts && aztec-nargo compile",
     "codegen": "aztec codegen contracts/target --outdir src/artifacts",
     "build:contracts": "pnpm compile && pnpm codegen",
-    "setup:testnet": "bash scripts/setup-testnet-account.sh",
     "setup:hybrid": "bash scripts/setup-hybrid-pxe.sh",
+    "setup:remote": "bash scripts/setup-testnet-account.sh",
+    "setup:testnet": "echo 'Choose: pnpm setup:hybrid (recommended) or pnpm setup:remote (simple)'",
     "deploy:token": "tsx scripts/deploy_token.ts",
     "deploy:contract": "tsx scripts/deploy_contract.ts",
-    "deploy:testnet": "echo 'Run: pnpm setup:testnet first, then pnpm deploy:token, then pnpm deploy:contract'",
     "tip:test": "tsx scripts/tip.ts",
     "scan:notes": "tsx scripts/scan.ts",
     "clean": "rm -rf ./src/artifacts ./contracts/target"

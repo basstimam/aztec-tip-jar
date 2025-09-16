@@ -40,7 +40,10 @@ if [[ "$PXE_URL" == *"localhost"* ]]; then
     fi
     
     echo "🔍 Checking if local PXE is running..."
-    if curl -s http://localhost:8080/status > /dev/null 2>&1; then
+    # Try multiple methods to check PXE status
+    if curl -f -s http://localhost:8080/ > /dev/null 2>&1 || \
+       curl -f -s http://localhost:8080/status > /dev/null 2>&1 || \
+       aztec info 2>/dev/null | grep -q "PXE"; then
         echo "✅ Local PXE is already running!"
     else
         echo "🚀 Starting local PXE connected to testnet..."
@@ -53,9 +56,11 @@ if [[ "$PXE_URL" == *"localhost"* ]]; then
         echo "⏳ Waiting for PXE to start..."
         sleep 10
         
-        # Check if PXE is running
+        # Check if PXE is running with multiple methods
         for i in {1..30}; do
-            if curl -s http://localhost:8080/status > /dev/null 2>&1; then
+            if curl -f -s http://localhost:8080/ > /dev/null 2>&1 || \
+               curl -f -s http://localhost:8080/status > /dev/null 2>&1 || \
+               aztec info 2>/dev/null | grep -q "PXE"; then
                 echo "✅ Local PXE started successfully!"
                 break
             fi
@@ -63,7 +68,10 @@ if [[ "$PXE_URL" == *"localhost"* ]]; then
             sleep 2
         done
         
-        if ! curl -s http://localhost:8080/status > /dev/null 2>&1; then
+        # Final check with all methods
+        if ! (curl -f -s http://localhost:8080/ > /dev/null 2>&1 || \
+              curl -f -s http://localhost:8080/status > /dev/null 2>&1 || \
+              aztec info 2>/dev/null | grep -q "PXE"); then
             echo "❌ Failed to start local PXE"
             echo "📖 Check logs: tail -f pxe.log"
             exit 1
@@ -128,6 +136,6 @@ echo "3. Deploy TipJar: pnpm deploy:contract"
 echo "4. Test frontend: pnpm dev"
 echo ""
 echo "🛠️ Useful Commands:"
-echo "Check PXE status: curl http://localhost:8080/status"
+echo "Check PXE status: curl -f http://localhost:8080/ || aztec info"
 echo "List accounts: aztec accounts list"
 echo "View PXE logs: tail -f pxe.log"

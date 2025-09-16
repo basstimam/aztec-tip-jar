@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Aztec Testnet Account Setup Script with Extended Timeout
-# This script sets up an account for deployment to Aztec testnet
+# Remote PXE Setup: Full Remote Configuration for Simple Deployment
+# This script sets up account using full remote PXE (no local setup required)
 
 set -e
 
@@ -13,10 +13,10 @@ NODE_URL=${NODE_URL:-"https://aztec-alpha-testnet-fullnode.zkv.xyz"}
 SPONSORED_FPC_ADDRESS=${SPONSORED_FPC_ADDRESS:-"0x19b5539ca1b104d4c3705de94e4555c9630def411f025e023a13189d0c56f8f2"}
 WALLET_ALIAS=${WALLET_ALIAS:-"my-wallet"}
 
-echo "🚀 Setting up Aztec testnet account..."
-echo "📡 Node URL: $NODE_URL"
+echo "🌐 Setting up Remote PXE Configuration..."
+echo "📡 Remote PXE & Node: https://aztec-alpha-testnet-fullnode.zkv.xyz"
 echo "👛 Wallet alias: $WALLET_ALIAS"
-echo "💰 Sponsored FPC: $SPONSORED_FPC_ADDRESS"
+echo "✨ Simple setup - no local PXE required!"
 echo ""
 
 # Function to check if account exists
