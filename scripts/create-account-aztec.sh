@@ -15,10 +15,12 @@ source .env 2>/dev/null || echo "No .env file found, using defaults"
 # Environment variables
 NODE_URL=${NODE_URL:-"https://aztec-alpha-testnet-fullnode.zkv.xyz"}
 PXE_URL=${PXE_URL:-"http://localhost:8080"}
+SPONSORED_FPC_ADDRESS=${SPONSORED_FPC_ADDRESS:-"0x19b5539ca1b104d4c3705de94e4555c9630def411f025e023a13189d0c56f8f2"}
 
 echo "📋 Configuration:"
 echo "   - PXE URL: $PXE_URL"
 echo "   - Node URL: $NODE_URL"
+echo "   - Sponsored FPC: $SPONSORED_FPC_ADDRESS"
 echo ""
 
 # Check if PXE is running
@@ -61,10 +63,11 @@ echo "2️⃣ Creating account with aztec CLI..."
 
 # Create account using aztec CLI (official documentation)
 echo "📝 Creating account with sponsored FPC..."
+echo "💰 Using FPC: $SPONSORED_FPC_ADDRESS"
 aztec create-account \
     --rpc-url $PXE_URL \
     --public-deploy \
-    --payment method=fpc-sponsored \
+    --payment method=fpc-sponsored,fpc=$SPONSORED_FPC_ADDRESS \
     --no-wait
 
 CREATE_RESULT=$?

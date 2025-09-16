@@ -89,10 +89,11 @@ echo "📝 Using aztec CLI with built-in sponsored FPC support"
 
 # Create and deploy account using aztec CLI
 echo "🔧 Creating account with sponsored payment..."
+echo "💰 Using sponsored FPC: $SPONSORED_FPC_ADDRESS"
 aztec create-account \
     --rpc-url $PXE_URL \
     --public-deploy \
-    --payment method=fpc-sponsored \
+    --payment method=fpc-sponsored,fpc=$SPONSORED_FPC_ADDRESS \
     --no-wait
 
 ACCOUNT_RESULT=$?

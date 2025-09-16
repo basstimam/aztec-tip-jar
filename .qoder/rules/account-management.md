@@ -1,5 +1,6 @@
 ---
-trigger: manual
+trigger: always_on
+alwaysApply: true
 ---
 Account Management
 Consider using the aztec-wallet for account management (or contract interaction) related actions, since it has a PXE internally and manages aliases to get you started quicker.

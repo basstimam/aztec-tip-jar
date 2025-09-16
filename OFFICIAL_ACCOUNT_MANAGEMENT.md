@@ -127,7 +127,11 @@ pnpm test:wallet
 
 ### Sponsored FPC (Recommended for Testnet)
 ```bash
---payment method=fpc-sponsored
+# Dengan FPC address yang spesifik
+--payment method=fpc-sponsored,fpc=0x19b5539ca1b104d4c3705de94e4555c9630def411f025e023a13189d0c56f8f2
+
+# Atau menggunakan contracts reference (jika tersedia)
+--payment method=fpc-sponsored,fpc=contracts:sponsoredfpc
 ```
 
 ### Fee Juice
