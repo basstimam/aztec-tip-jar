@@ -7,12 +7,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "build:contracts": "aztec-nargo compile",
-    "codegen": "aztec codegen target --outdir src/artifacts",
+    "compile": "cd contracts && aztec-nargo compile",
+    "codegen": "aztec codegen contracts/target --outdir src/artifacts",
+    "build:contracts": "pnpm compile && pnpm codegen",
+    "setup:testnet": "bash scripts/setup-testnet-account.sh",
+    "deploy:token": "tsx scripts/deploy_token.ts",
     "deploy:contract": "tsx scripts/deploy_contract.ts",
+    "deploy:testnet": "echo 'Run: pnpm setup:testnet first, then pnpm deploy:token, then pnpm deploy:contract'",
     "tip:test": "tsx scripts/tip.ts",
-    "compile": "aztec-nargo compile",
-    "clean": "rm -rf ./src/artifacts ./target"
+    "scan:notes": "tsx scripts/scan.ts",
+    "clean": "rm -rf ./src/artifacts ./contracts/target"
   },
   "dependencies": {
     "@aztec/accounts": "1.2.0",

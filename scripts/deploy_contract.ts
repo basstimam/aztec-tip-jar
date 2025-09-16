@@ -1,9 +1,6 @@
-import { createLogger, PXE, Logger, SponsoredFeePaymentMethod, Fr } from "@aztec/aztec.js";
-import { setupPXE } from "../src/utils/setup_pxe.js";
-import { getSponsoredFPCInstance } from "../src/utils/sponsored_fpc.js";
-// Note: SponsoredFPC is not available in the current version, will use mock for now
-// import { SponsoredFPCContract } from "@aztec/noir-contracts.js/SponsoredFPC";
-import { deploySchnorrAccount } from "../src/utils/deploy_account.js";
+import 'dotenv/config';
+import { createLogger, PXE, Logger, Fr, AztecAddress, waitForPXE, createPXEClient } from "@aztec/aztec.js";
+import { getDeployedTestAccountsWallets } from "@aztec/accounts/testing";
 import { TipJarContract } from "../src/artifacts/TipJar.js";
 
 async function main() {
@@ -15,38 +12,38 @@ async function main() {
 
     // Setup PXE
     logger.info('📡 Setting up PXE connection...');
-    pxe = await setupPXE();
+    pxe = createPXEClient(process.env.PXE_URL || "http://localhost:8080");
+    await waitForPXE(pxe);
     const nodeInfo = await pxe.getNodeInfo();
-    logger.info(`📊 Node info: ${JSON.stringify(nodeInfo, null, 2)}`);
+    logger.info(`📊 Node info: Chain ID ${nodeInfo.l1ChainId}, Version ${nodeInfo.nodeVersion}`);
 
-    // Setup sponsored FPC
-    logger.info('💰 Setting up sponsored fee payment contract...');
-    const sponsoredFPC = await getSponsoredFPCInstance();
-    logger.info(`💰 Sponsored FPC instance obtained at: ${sponsoredFPC.address}`);
+    // Get pre-deployed test accounts from sandbox
+    logger.info('👥 Getting test accounts from sandbox...');
+    const testWallets = await getDeployedTestAccountsWallets(pxe);
+    
+    if (testWallets.length === 0) {
+        throw new Error("No test accounts found. Make sure sandbox is running with test accounts.");
+    }
 
-    logger.info('📝 Using mock sponsored FPC for development...');
-    // Note: In production, register actual SponsoredFPC contract with PXE
-    // await pxe.registerContract({ instance: sponsoredFPC, artifact: SponsoredFPCContract.artifact });
-    const sponsoredPaymentMethod = new SponsoredFeePaymentMethod(sponsoredFPC.address);
-    logger.info('✅ Mock sponsored fee payment method configured');
-
-    // Deploy account
-    logger.info('👤 Deploying Schnorr account...');
-    let accountManager = await deploySchnorrAccount(pxe);
-    const wallet = await accountManager.getWallet();
-    const address = await accountManager.getAddress();
-    logger.info(`✅ Account deployed successfully at: ${address}`);
+    const wallet = testWallets[0]; // Use first test account
+    const address = wallet.getAddress();
+    logger.info(`✅ Using test account: ${address}`);
 
     // Deploy TipJar contract
     logger.info('💰 Starting TipJar contract deployment...');
     logger.info(`👤 Owner address for TipJar contract: ${address}`);
 
-    // For demo, we'll use a mock token address - in real deployment, use actual token
-    const mockTokenAddress = AztecAddress.fromString("0x1234567890123456789012345678901234567890");
+    // Get token address from environment variable
+    const tokenAddressStr = process.env.ACCEPTED_TOKEN;
+    if (!tokenAddressStr) {
+        throw new Error("ACCEPTED_TOKEN environment variable is required. Deploy token first using 'pnpm deploy:token'");
+    }
 
-    const deployTx = TipJarContract.deploy(wallet, address, mockTokenAddress).send({
-        fee: { paymentMethod: sponsoredPaymentMethod }
-    });
+    const tokenAddress = AztecAddress.fromString(tokenAddressStr);
+    logger.info(`🪙 Using token address: ${tokenAddress}`);
+
+    logger.info('🚀 Deploying TipJar contract...');
+    const deployTx = TipJarContract.deploy(wallet, address, tokenAddress).send();
 
     logger.info('⏳ Waiting for deployment transaction to be mined...');
     const tipJarContract = await deployTx.deployed({ timeout: 120000 });
@@ -54,7 +51,7 @@ async function main() {
     logger.info(`🎉 TipJar Contract deployed successfully!`);
     logger.info(`📍 Contract address: ${tipJarContract.address}`);
     logger.info(`👤 Owner address: ${address}`);
-    logger.info(`💰 Accepted token: ${mockTokenAddress}`);
+    logger.info(`💰 Accepted token: ${tokenAddress}`);
 
     // Verify deployment
     logger.info('🔍 Verifying contract deployment...');
@@ -69,8 +66,10 @@ async function main() {
     logger.info(`📋 Summary:`);
     logger.info(`   - Contract Address: ${tipJarContract.address}`);
     logger.info(`   - Owner Address: ${address}`);
-    logger.info(`   - Accepted Token: ${mockTokenAddress}`);
-    logger.info(`   - Sponsored FPC: ${sponsoredFPC.address}`);
+    logger.info(`   - Accepted Token: ${tokenAddress}`);
+    
+    logger.info('💡 Next step: Add contract address to .env');
+    logger.info(`📝 Add to .env: TIPJAR_ADDRESS=${tipJarContract.address}`);
 }
 
 main().catch((error) => {
