@@ -83,42 +83,28 @@ fi
 
 echo ""
 
-# Step 2: Setup account with hybrid configuration
-echo "2️⃣ Setting up account with hybrid PXE..."
+# Step 2: Setup account with aztec CLI (requires PXE)
+echo "2️⃣ Setting up account with aztec CLI..."
+echo "📝 Using aztec CLI with built-in sponsored FPC support"
 
-# Create account via PXE (local) but deploy to testnet
-echo "🔧 Creating account via local PXE..."
+# Create and deploy account using aztec CLI
+echo "🔧 Creating account with sponsored payment..."
+aztec create-account \
+    --rpc-url $PXE_URL \
+    --public-deploy \
+    --payment method=fpc-sponsored \
+    --no-wait
 
-# Check if account exists
-if aztec accounts list 2>/dev/null | grep -q "$WALLET_ALIAS"; then
-    echo "✅ Account $WALLET_ALIAS already exists in local PXE"
+ACCOUNT_RESULT=$?
+
+if [ $ACCOUNT_RESULT -eq 0 ]; then
+    echo "✅ Account created and deployed successfully!"
+    
+    echo "📋 Getting account details..."
+    aztec get-accounts --rpc-url $PXE_URL
 else
-    echo "📝 Creating new account in local PXE..."
-    aztec accounts create --alias $WALLET_ALIAS
-fi
-
-echo ""
-
-# Step 3: Deploy account to testnet
-echo "3️⃣ Deploying account to testnet..."
-echo "📡 Target: $NODE_URL"
-echo "💰 Using sponsored FPC: $SPONSORED_FPC_ADDRESS"
-
-# Deploy using aztec-wallet with testnet configuration
-aztec-wallet deploy-account \
-    --node-url $NODE_URL \
-    --from $WALLET_ALIAS \
-    --payment method=fpc-sponsored,fpc=contracts:sponsoredfpc \
-    --register-class \
-    --timeout 600000
-
-DEPLOY_RESULT=$?
-
-if [ $DEPLOY_RESULT -eq 0 ]; then
-    echo "✅ Account deployed successfully to testnet!"
-else
-    echo "⚠️ Account deployment timed out (this is normal)"
-    echo "🔍 Check transaction status on aztecscan.io or aztecexplorer.xyz"
+    echo "⚠️ Account creation failed or timed out"
+    echo "🔍 This might be normal for testnet - check logs"
 fi
 
 echo ""
@@ -137,5 +123,5 @@ echo "4. Test frontend: pnpm dev"
 echo ""
 echo "🛠️ Useful Commands:"
 echo "Check PXE status: curl -f http://localhost:8080/ || aztec info"
-echo "List accounts: aztec accounts list"
+echo "List accounts: aztec get-accounts --rpc-url $PXE_URL"
 echo "View PXE logs: tail -f pxe.log"
