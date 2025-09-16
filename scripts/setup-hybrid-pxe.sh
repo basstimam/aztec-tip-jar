@@ -83,29 +83,47 @@ fi
 
 echo ""
 
-# Step 2: Setup account with aztec CLI (requires PXE)
-echo "2️⃣ Setting up account with aztec CLI..."
-echo "📝 Using aztec CLI with built-in sponsored FPC support"
+# Step 2: Setup account with aztec-wallet (recommended)
+echo "2️⃣ Setting up account with aztec-wallet..."
+echo "📝 Using aztec-wallet (has built-in PXE and is recommended)"
 
-# Create and deploy account using aztec CLI
-echo "🔧 Creating account with sponsored payment..."
-echo "💰 Using sponsored FPC: $SPONSORED_FPC_ADDRESS"
-aztec create-account \
-    --rpc-url $PXE_URL \
-    --public-deploy \
-    --payment method=fpc-sponsored,fpc=$SPONSORED_FPC_ADDRESS \
-    --no-wait
+# Use aztec-wallet for simpler account creation (recommended in docs)
+echo "🔧 Step 1: Creating account with aztec-wallet..."
+aztec-wallet create-account \
+    --register-only \
+    -a main \
+    --node-url $NODE_URL
 
-ACCOUNT_RESULT=$?
+CREATE_RESULT=$?
 
-if [ $ACCOUNT_RESULT -eq 0 ]; then
-    echo "✅ Account created and deployed successfully!"
+if [ $CREATE_RESULT -eq 0 ]; then
+    echo "✅ Account created successfully!"
     
-    echo "📋 Getting account details..."
-    aztec get-accounts --rpc-url $PXE_URL
+    echo ""
+    echo "🔧 Step 2: Registering sponsored FPC..."
+    aztec-wallet register-contract $SPONSORED_FPC_ADDRESS SponsoredFPC \
+        --from main \
+        --node-url $NODE_URL \
+        --salt 0 \
+        -a sponsoredfpc
+    
+    echo ""
+    echo "🚀 Step 3: Deploying account..."
+    aztec-wallet deploy-account \
+        --node-url $NODE_URL \
+        --payment method=fpc-sponsored,fpc=$SPONSORED_FPC_ADDRESS
+    
+    DEPLOY_RESULT=$?
+    
+    if [ $DEPLOY_RESULT -eq 0 ]; then
+        echo "✅ Account deployed successfully!"
+    else
+        echo "⚠️ Account deployment timed out (normal for testnet)"
+        echo "🔍 Check transaction status on aztecscan.io"
+    fi
 else
-    echo "⚠️ Account creation failed or timed out"
-    echo "🔍 This might be normal for testnet - check logs"
+    echo "❌ Account creation failed"
+    echo "🔍 Check connection and try aztec-wallet directly"
 fi
 
 echo ""
